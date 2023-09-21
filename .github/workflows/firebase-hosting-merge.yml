@@ -17,5 +17,5 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TO_DO_LISTEN_APP }}'
           channelId: live
-          projectId: lkdv
+          projectId: to-do-listen-app
 
