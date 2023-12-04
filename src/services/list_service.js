@@ -1,7 +1,8 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase.config';
 
-const fetchLists = async () => {
-  const querySnapshot = await getDocs(collection(db, "posts"));
+export const fetchTodos = async () => {
+  console.log('fetchTodos');
+  const querySnapshot = await getDocs(collection(db, "todos"));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
