@@ -1,18 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input, Button } from '@mui/joy';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTodos } from './services/list_service';
+import  {onSnapshot, collection} from 'firebase/firestore';
+import { db } from './services/firebase.config';
 export function TodoList() {
-    const {data} = useQuery({
-        queryKey: ['todos'],
-        queryFn: fetchTodos
-    })
-    console.log(data);
+    // const {data} = useQuery({
+    //     queryKey: ['todos'],
+    //     queryFn: fetchTodos
+    // })
+    const [input, setInput] = useState('');
     const [todos, setTodos] = useState([
         'Create Blockchain App',
         'Create a Youtube Tutorial'
     ]);
-    const [input, setInput] = useState('');
+        useEffect(() => {
+        onSnapshot(collection(db, 'todos'), (snapshot) => {
+            setTodos(snapshot.docs.map(doc => doc.data().todo))
+        })
+    }, [input]);
     const addTodo = () => {
         setTodos([...todos, input]);
         setInput('')
