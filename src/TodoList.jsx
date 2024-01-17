@@ -12,11 +12,46 @@ import { fetchTodos } from './services/list_service';
 import { onSnapshot, collection } from 'firebase/firestore';
 import { db } from './services/firebase.config';
 
+const containerStyle = {
+  maxWidth: '350px', 
+  width: `100%`
+};
+
+const inputStyle = {
+  margin: "0px 5px 10px 0px",
+  width: '100%', 
+};
+
+const buttonStyle = {
+  width: '100%', 
+  margin: '0 0 10px 0',
+};
+
+const listItemStyle = {
+  marginBottom: '10px', 
+  padding: '15px', 
+  border: `1px solid`,
+  borderRadius: `8px`,
+  overflow: `hidden`
+};
+
+const listItemTextStyle = {
+  overflowWrap: `break-word`
+}
+
+const titleStyle = {
+  textAlign: 'center', 
+  marginBottom: '20px', 
+  fontSize: '24px', 
+  fontWeight: 'bold', 
+  color: '#3f51b5', 
+};
+
 export function TodoList() {
   const [input, setInput] = useState('');
   const [todos, setTodos] = useState([
-    'Create Blockchain App',
-    'Create a Youtube Tutorial'
+    'Create Swipe function with swipeable',
+    'Create second window or popup for todos'
   ]);
 
   useEffect(() => {
@@ -26,41 +61,27 @@ export function TodoList() {
   }, [input]);
 
   const addTodo = () => {
+    if (input) {
     setTodos([...todos, input]);
     setInput('')
+    }
   };
 
-  const containerStyle = {
-    maxWidth: '360px', 
-  };
+  const handleEnter = (e) => {
+    if (e.key === `Enter`) {
+      e.preventDefault();
+      addTodo();
+    }
+  }
 
-  const inputStyle = {
-    margin: "0px 5px 10px 0px",
-    width: '100%', 
-  };
-
-  const buttonStyle = {
-    width: '100%', 
-    margin: '0 0 10px 0',
-  };
-
-  const listItemStyle = {
-    marginBottom: '10px', 
-    padding: '15px', 
-    border: `1px solid`
-  };
-
-  const titleStyle = {
-    textAlign: 'center', 
-    marginBottom: '20px', 
-    fontSize: '24px', 
-    fontWeight: 'bold', 
-    color: '#3f51b5', 
-  };
+  const handleChange = (e) => { 
+    setInput(e.target.value) 
+  }
 
   return (
     <div className="App">
-      <Container maxWidth="xl" sx={containerStyle}>
+      <Box display= "flex" width="100%" justifyContent="center">
+      <Box sx={containerStyle}>
         <Typography variant="h1" sx={titleStyle}> TODO List App</Typography>
         <form>
           <Input
@@ -69,7 +90,8 @@ export function TodoList() {
             variant='outlined'
             style={inputStyle}
             size="md" value={input}
-            onChange={e => setInput(e.target.value)} 
+            onKeyDown={handleEnter}
+            onChange={handleChange} 
           />
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Button
@@ -85,14 +107,15 @@ export function TodoList() {
         <List sx={{ p: 0 }}>
           {todos.map((todo, index) => (
             <React.Fragment key={index}>
-              <ListItem component="div" disablePadding sx={listItemStyle}>
-                <ListItemText primary={todo} />
+              <ListItem component="div" sx={listItemStyle}>
+                <ListItemText sx={listItemTextStyle} primary={todo} />
                 {index < todos.length - 1 && <Divider light />}
               </ListItem>
             </React.Fragment>
           ))}
         </List>
-      </Container>
+      </Box>
+      </Box>
     </div>
   );
 }
