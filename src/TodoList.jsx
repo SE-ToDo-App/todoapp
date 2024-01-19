@@ -3,15 +3,15 @@ import { Input, Button, Box, Typography, Checkbox } from '@mui/joy';
 import AddIcon from '@mui/icons-material/Add'; 
 import Container from '@mui/material/Container';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTodos } from './services/list_service';
 import { onSnapshot, collection } from 'firebase/firestore';
 import { db } from './services/firebase.config';
 
+import { ToDoItem } from './services/todoitem';
 const containerStyle = {
   maxWidth: '350px', 
   width: `100%`
@@ -27,17 +27,6 @@ const buttonStyle = {
   margin: '0 0 10px 0',
 };
 
-const listItemStyle = {
-  marginBottom: '10px', 
-  padding: '15px', 
-  border: `1px solid`,
-  borderRadius: `8px`,
-  overflow: `hidden`
-};
-
-const listItemTextStyle = {
-  overflowWrap: `break-word`
-}
 
 const titleStyle = {
   textAlign: 'center', 
@@ -78,6 +67,8 @@ export function TodoList() {
     setInput(e.target.value) 
   }
 
+
+
   return (
     <div className="App">
       <Box display= "flex" width="100%" justifyContent="center">
@@ -107,11 +98,9 @@ export function TodoList() {
         <List sx={{ p: 0 }}>
           {todos.map((todo, index) => (
             <React.Fragment key={index}>
-              <ListItem component="div" sx={listItemStyle}>
-                <ListItemText sx={listItemTextStyle} primary={todo} />
-                {index < todos.length - 1 && <Divider light />}
-              </ListItem>
-            </React.Fragment>
+<ToDoItem todo={todo} /> 
+  {index < todos.length - 1 && <Divider light />}
+</React.Fragment>
           ))}
         </List>
       </Box>
