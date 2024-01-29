@@ -11,7 +11,7 @@ import { fetchTodos } from './services/list_service';
 import { onSnapshot, collection } from 'firebase/firestore';
 import { db } from './services/firebase.config';
 
-import { ToDoItem } from './services/todoitem';
+import { ToDoItem } from './ToDoItem';
 const containerStyle = {
   maxWidth: '350px', 
   width: `100%`
