@@ -4,6 +4,15 @@ import { auth } from "../services/firebase.config";
 import { signInWithGoogle } from "../services/auth/google_login";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { Input, Button, Container, Box, Typography } from "@mui/joy";
+
+const titleStyle = {
+  textAlign: "center",
+  marginBottom: "20px",
+  fontSize: "24px",
+  fontWeight: "bold",
+  color: "#3f51b5",
+};
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -18,38 +27,54 @@ function Login() {
     if (user) navigate("/");
   }, [user, loading]);
   return (
-    <div className="login">
-      <div className="login__container">
-        <input
+    <Box display="flex" justifyContent="center" width="100%">
+      <Box
+        minWidth="300px"
+        maxWidth="400px"
+        width="100%"
+        display="flex"
+        justifyContent="center"
+        flexDirection="column"
+        alignItems="center"
+        gap={2}
+      >
+        <Typography variant="h1" sx={titleStyle}>
+          Login
+        </Typography>
+        <Input
+          fullWidth
           type="text"
-          className="login__textBox"
+          variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="E-mail Address"
         />
-        <input
+        <Input
+          fullWidth
           type="password"
-          className="login__textBox"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
-        <button
-          className="login__btn"
-          onClick={() => signInWithEmailAndPassword(email, password)}
-        >
-          Login
-        </button>
-        <button className="login__btn login__google" onClick={signInWithGoogle}>
-          Login with Google
-        </button>
-        <div>
+        <Box display="flex" justifyContent="space-evenly" gap={2}>
+          <Button
+            onClick={() => signInWithEmailAndPassword(email, password)}
+            loading={loading}
+          >
+            Login
+          </Button>
+          <Button onClick={signInWithGoogle} loading={loading}>
+            Login with Google
+          </Button>
+        </Box>
+        <Box>
           <Link to="/reset">Forgot Password</Link>
-        </div>
-        <div>Don't have an account? <Link to="/register">Register</Link> now.
-        </div>
-      </div>
-    </div>
+        </Box>
+        <Box>
+          Don't have an account? <Link to="/register">Register</Link> now.
+        </Box>
+      </Box>
+    </Box>
   );
 }
 export default Login;
