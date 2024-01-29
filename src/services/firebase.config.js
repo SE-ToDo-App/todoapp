@@ -3,6 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, signOut } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -15,7 +17,7 @@ const firebaseConfig = {
   storageBucket: "to-do-listen-app.appspot.com",
   messagingSenderId: "1093318005961",
   appId: "1:1093318005961:web:4fe93537938445e0a0e918",
-  measurementId: "G-DT9P1PVKLR"
+  measurementId: "G-DT9P1PVKLR",
 };
 
 // Initialize Firebase
@@ -24,7 +26,7 @@ export const analytics = getAnalytics(app);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
+export const useAuth = () => useAuthState(auth);
 export const logout = () => {
   signOut(auth);
 };
-

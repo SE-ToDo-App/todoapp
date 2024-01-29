@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../services/firebase.config";
+import { useAuth } from "../services/firebase.config";
 import { signInWithGoogle } from "../services/auth/google_login";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button, Container, Box, Typography } from "@mui/joy";
 
@@ -17,7 +16,7 @@ const titleStyle = {
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) {
