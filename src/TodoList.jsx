@@ -8,10 +8,11 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTodos } from './services/list_service';
-import { onSnapshot, collection } from 'firebase/firestore';
+import { onSnapshot, collection, addDoc } from 'firebase/firestore';
 import { db } from './services/firebase.config';
 
 import { ToDoItem } from './ToDoItem';
+
 const containerStyle = {
   maxWidth: '350px', 
   width: `100%`
@@ -45,14 +46,19 @@ export function TodoList() {
 
   useEffect(() => {
     onSnapshot(collection(db, 'todos'), (snapshot) => {
-      setTodos(snapshot.docs.map(doc => doc.data().todo))
+      setTodos(snapshot.docs.map(doc => doc.data().todoName))
     })
   }, [input]);
 
-  const addTodo = () => {
+  const addTodo = async () => {
     if (input) {
     setTodos([...todos, input]);
-    setInput('')
+    setInput('');
+    try {
+    await addDoc(collection(db, `todos`), {todoName: input});
+    } catch (e) {
+       console.log(`Nutten`+e);
+    }
     }
   };
 
