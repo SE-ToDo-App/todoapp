@@ -1,29 +1,36 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { TodoList } from "./TodoList.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
-import ScopedCssBaseline from "@mui/joy/ScopedCssBaseline";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import Login from "./components/Login.jsx";
-import { useState } from "react";
 import { Box } from "@mui/joy";
+import Login from "./components/Login.jsx";
+import Register from "./components/Register.jsx";
+import ScopedCssBaseline from "@mui/joy/ScopedCssBaseline";
+import Sidebar from "./components/Sidebar.jsx";
+import { TodoList } from "./components/todo";
+import { useState } from "react";
+
 const queryClient = new QueryClient();
-const theme = extendTheme({
-  components: {
-    JoyScopedCssBaseline: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          // ...CSS object styles
-        }),
-      },
-    },
-  },
-});
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <TodoList />,
+    element: <Sidebar />,
+    children: [
+      {
+        index: true,
+        element: <TodoList />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
+
     // children: [
     //   {
     //     path: "team",
@@ -32,7 +39,6 @@ const router = createBrowserRouter([
     //   },
     // ],
   },
-  { path: "/login", element: <Login /> },
 ]);
 
 const App = () => {
@@ -42,10 +48,8 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <CssVarsProvider
         colorSchemeNode={root}
-        theme={theme}
         defaultMode="system"
-        modeStorageKey="krassed-todoapp"
-      >
+        modeStorageKey="awesome-todoapp">
         <ScopedCssBaseline ref={(element) => setRoot(element)}>
           <Box width="100vw" height="100vh">
             <RouterProvider router={router} />

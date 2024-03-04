@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { Box, Button, Container, Input, Typography } from "@mui/joy";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../services/firebase.config";
-import { signInWithGoogle } from "../services/auth/google_login";
+import { logout, useAuth } from "../services/firebase.config";
+import { useEffect, useState } from "react";
+
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Input, Button, Container, Box, Typography } from "@mui/joy";
+import { signInWithGoogle } from "../services/auth/google_login";
 
 const titleStyle = {
   textAlign: "center",
@@ -23,7 +24,7 @@ function Login() {
       // maybe trigger a loading screen
       return;
     }
-    if (user) navigate("/");
+    if (user) navigate("/", { replace: true });
   }, [user, loading]);
   return (
     <Box display="flex" justifyContent="center" width="100%">
@@ -35,8 +36,7 @@ function Login() {
         justifyContent="center"
         flexDirection="column"
         alignItems="center"
-        gap={2}
-      >
+        gap={2}>
         <Typography variant="h1" sx={titleStyle}>
           Login
         </Typography>
@@ -58,8 +58,7 @@ function Login() {
         <Box display="flex" justifyContent="space-evenly" gap={2}>
           <Button
             onClick={() => signInWithEmailAndPassword(email, password)}
-            loading={loading}
-          >
+            loading={loading}>
             Login
           </Button>
           <Button onClick={signInWithGoogle} loading={loading}>
@@ -76,4 +75,24 @@ function Login() {
     </Box>
   );
 }
-export default Login;
+
+function Logout() {
+  const [user] = useAuth();
+  console.log(user);
+  const handleClick = () => {
+    logout();
+  };
+  return (
+    <>
+      <Typography variant="h1" sx={titleStyle}>
+        Hello, {user.displayName}
+      </Typography>
+      <Button onClick={handleClick}>Logout</Button>
+    </>
+  );
+}
+
+export default function LoginWrapper() {
+  const [user] = useAuth();
+  return <Container>{user ? <Logout /> : <Login />}</Container>;
+}

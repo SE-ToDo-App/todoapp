@@ -1,15 +1,6 @@
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import {
-  query,
-  getDocs,
-  collection,
-  where,
-  addDoc,
-} from "firebase/firestore";
-import { db, auth } from "../firebase.config";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { auth, db } from "../firebase.config";
 
 const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = async () => {
