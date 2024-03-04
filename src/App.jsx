@@ -1,6 +1,7 @@
 import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
 import { Box } from "@mui/joy";
 import Login from "./components/Login.jsx";
@@ -53,6 +54,10 @@ const App = () => {
         <ScopedCssBaseline ref={(element) => setRoot(element)}>
           <Box width="100vw" height="100vh">
             <RouterProvider router={router} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{ duration: 3000 }}
+            />
           </Box>
         </ScopedCssBaseline>
       </CssVarsProvider>

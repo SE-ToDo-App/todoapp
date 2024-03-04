@@ -12,8 +12,10 @@ import {
 import { InfoOutlined } from "@mui/icons-material";
 import { registerWithEmailAndPassword } from "../services/auth/email_login";
 import { useForm } from "@tanstack/react-form";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate();
   const { Provider, Field, handleSubmit, useStore } = useForm({
     defaultValues: {
       email: "",
@@ -29,8 +31,13 @@ export default function Register() {
       },
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
-      // registerWithEmailAndPassword(values.name, values.email, values.password);
+      registerWithEmailAndPassword(
+        value.name,
+        value.email,
+        value.password
+      ).then(() => {
+        navigate("/");
+      });
     },
   });
 

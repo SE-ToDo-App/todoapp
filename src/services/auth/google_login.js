@@ -1,16 +1,18 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../firebase.config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+import toast from "react-hot-toast";
 
 const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
     const user = res.user;
-    const q = query(collection(db, "users"), where("uid", "==", user.uid));
-    const docs = await getDocs(q);
-    if (docs.docs.length === 0) {
-      await addDoc(collection(db, "users"), {
+    const userDocRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists()) {
+      await setDoc(userDocRef, {
         uid: user.uid,
         name: user.displayName,
         authProvider: "google",
@@ -19,6 +21,6 @@ export const signInWithGoogle = async () => {
     }
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    toast.error(err.message);
   }
 };
