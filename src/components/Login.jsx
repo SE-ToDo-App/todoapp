@@ -1,5 +1,5 @@
 import { Box, Button, Container, Input, Typography } from "@mui/joy";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { logout, useAuth } from "../services/firebase.config";
 import { useEffect, useState } from "react";
 
@@ -78,16 +78,19 @@ function Login() {
 
 function Logout() {
   const [user] = useAuth();
-  console.log(user);
   const handleClick = () => {
     logout();
   };
   return (
     <>
-      <Typography variant="h1" sx={titleStyle}>
-        Hello, {user.displayName}
-      </Typography>
-      <Button onClick={handleClick}>Logout</Button>
+      <Box display="flex" justifyContent="center" width="100%" mt={5}>
+        <Typography variant="h1" sx={titleStyle}>
+          Hello, {user.displayName}
+        </Typography>
+      </Box>
+      <Box display="flex" justifyContent="center" width="100%">
+        <Button onClick={handleClick}>Logout</Button>
+      </Box>
     </>
   );
 }

@@ -1,5 +1,6 @@
 import Badge, { badgeClasses } from "@mui/joy/Badge";
 import {
+  Button,
   IconButton,
   List,
   ListItem,
@@ -7,6 +8,7 @@ import {
   ListItemDecorator,
   useColorScheme,
 } from "@mui/joy";
+import { Outlet, useLoaderData, useNavigate } from "@tanstack/react-router";
 
 import AddIcon from "@mui/icons-material/Add";
 import Avatar from "@mui/joy/Avatar";
@@ -17,9 +19,9 @@ import CardContent from "@mui/joy/CardContent";
 import Chip from "@mui/joy/Chip";
 import CircularProgress from "@mui/joy/CircularProgress";
 import ColorLensRoundedIcon from "@mui/icons-material/ColorLensRounded";
+import CreateTodo from "./todo/CreateTodoList";
 import ListSubheader from "@mui/joy/ListSubheader";
 import Option from "@mui/joy/Option";
-import { Outlet } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import PieChart from "@mui/icons-material/PieChart";
 import Select from "@mui/joy/Select";
@@ -27,8 +29,6 @@ import Sheet from "@mui/joy/Sheet";
 import SmsIcon from "@mui/icons-material/Sms";
 import Typography from "@mui/joy/Typography";
 import { useAuth } from "../services/firebase.config";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 const containerStyle = {
   display: "flex",
@@ -37,6 +37,7 @@ const containerStyle = {
 };
 export default function Sidebar() {
   const { mode, setMode } = useColorScheme();
+  const { groups } = useLoaderData({ strict: false });
   const [user] = useAuth();
   const navigate = useNavigate();
   return (
@@ -94,8 +95,11 @@ export default function Sidebar() {
             </Sheet>
           }
           sx={{ py: 1 }}>
-          <Option value="1">TodoSet1</Option>
-          <Option value="2">TodoSet2</Option>
+          {groups?.map((group, index) => (
+            <Option value={String(index + 1)} key={group}>
+              {group}
+            </Option>
+          ))}
         </Select>
         <List
           sx={{
@@ -128,6 +132,12 @@ export default function Sidebar() {
             Tags
           </ListItemButton>
         </List>
+        <ListItem nested>
+          <ListSubheader>Shortcuts</ListSubheader>
+          <List>
+            <CreateTodo />
+          </List>
+        </ListItem>
         <Card
           variant="soft"
           orientation="horizontal"

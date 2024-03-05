@@ -12,7 +12,7 @@ import {
 import { InfoOutlined } from "@mui/icons-material";
 import { registerWithEmailAndPassword } from "../services/auth/email_login";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function Register() {
   const navigate = useNavigate();

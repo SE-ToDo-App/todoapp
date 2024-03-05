@@ -2,6 +2,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, db } from "../firebase.config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
+import { DEFAULT_GROUP_NAME } from "../../utils/constants";
 import toast from "react-hot-toast";
 
 const googleProvider = new GoogleAuthProvider();
@@ -17,6 +18,7 @@ export const signInWithGoogle = async () => {
         name: user.displayName,
         authProvider: "google",
         email: user.email,
+        groups: { [DEFAULT_GROUP_NAME]: true },
       });
     }
   } catch (err) {

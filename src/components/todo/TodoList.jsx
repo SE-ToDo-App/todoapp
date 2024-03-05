@@ -9,6 +9,10 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import {
+  addTodo as addTodoFirebase,
+  useTodos,
+} from "../../services/todo/addTodo";
 import { db, useAuth } from "../../services/firebase.config";
 import {
   useCollection,
@@ -23,7 +27,6 @@ import List from "@mui/material/List";
 import { ToDoItem } from "./TodoItem";
 import { fetchTodos } from "../../services/list_service";
 import { useQuery } from "@tanstack/react-query";
-import useTodos from "../../utils/hooks/useTodos";
 
 const containerStyle = {
   maxWidth: "350px",
@@ -52,33 +55,18 @@ export function TodoList() {
   const [user] = useAuth();
   const [input, setInput] = useState("");
 
-  const [todos, loading, error, snapshot] = useCollectionData(
-    user
-      ? query(collection(db, "todos"), where("uid", "==", user.uid), limit(10))
-      : null,
-    {
-      snapshotListenOptions: { includeMetadataChanges: true },
-    }
-  );
-  console.log(todos, loading, error, snapshot);
+  const [todos, loading, error, snapshot] = useTodos(user);
 
   const addTodo = async () => {
     if (input) {
       setInput("");
       if (!user) return;
-      try {
-        await addDoc(collection(db, `todos`), {
-          todoName: input,
-          uid: user.uid,
-        });
-      } catch (e) {
-        console.log(`Nutten` + e);
-      }
+      await addTodoFirebase({ todo: input, group: "groupplaceholder", user });
     }
   };
 
   const handleEnter = (e) => {
-    if (e.key === `Enter`) {
+    if (e.key === "Enter") {
       e.preventDefault();
       addTodo();
     }
@@ -118,7 +106,7 @@ export function TodoList() {
       <List sx={{ p: 0 }}>
         {todos?.map((todo, index) => (
           <React.Fragment key={index}>
-            <ToDoItem todo={todo.todoName} />
+            <ToDoItem todo={todo} />
             {index < todos.length - 1 && <Divider light />}
           </React.Fragment>
         ))}

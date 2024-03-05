@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
+import { DEFAULT_GROUP_NAME } from "../../utils/constants";
 import toast from "react-hot-toast";
 
 export const logInWithEmailAndPassword = async (email, password) => {
@@ -26,6 +27,7 @@ export const registerWithEmailAndPassword = async (name, email, password) => {
       name,
       authProvider: "local",
       email,
+      groups: { [DEFAULT_GROUP_NAME]: true },
     });
     await updateProfile(user, { displayName: name });
   } catch (err) {
