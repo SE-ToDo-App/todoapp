@@ -1,32 +1,17 @@
-import { Box, Button, Checkbox, Input, Sheet, Typography } from "@mui/joy";
-import React, { useEffect, useState } from "react";
-import {
-  addDoc,
-  collection,
-  getFirestore,
-  limit,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { Box, Button, Input, Typography } from "@mui/joy";
+import React, { useState } from "react";
 import {
   addTodo as addTodoFirebase,
   useTodos,
-} from "../../services/todo/addTodo";
-import { db, useAuth } from "../../services/firebase.config";
-import {
-  useCollection,
-  useCollectionData,
-} from "react-firebase-hooks/firestore";
+  todoCountLoader,
+} from "../../services/api";
+import { useAuth } from "../../services/firebase.config";
 
 import AddIcon from "@mui/icons-material/Add";
-import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import List from "@mui/material/List";
 import { ToDoItem } from "./TodoItem";
-import { fetchTodos } from "../../services/list_service";
-import { useQuery } from "@tanstack/react-query";
+import { useLoaderData, useSearch } from "@tanstack/react-router";
 
 const containerStyle = {
   maxWidth: "350px",
@@ -55,7 +40,8 @@ export function TodoList() {
   const [user] = useAuth();
   const [input, setInput] = useState("");
 
-  const [todos, loading, error, snapshot] = useTodos(user);
+  const todos = useLoaderData({strict: false});
+  console.log(todos, "todos")
 
   const addTodo = async () => {
     if (input) {

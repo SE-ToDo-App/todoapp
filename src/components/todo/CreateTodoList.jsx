@@ -11,15 +11,15 @@ import Input from "@mui/joy/Input";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import Stack from "@mui/joy/Stack";
-import { addGroup } from "../../services/todo/addTodo";
+import { addGroup } from "../../services/api";
 import { useForm } from "@tanstack/react-form";
 import { useRouteContext } from "@tanstack/react-router";
 import { useState } from "react";
 
+
 export default function CreateTodo() {
   const [open, setOpen] = useState(false);
   const { user } = useRouteContext({ strict: false });
-  console.log("user", user);
   const { Provider, Field, handleSubmit, useStore } = useForm({
     defaultValues: {
       name: "",

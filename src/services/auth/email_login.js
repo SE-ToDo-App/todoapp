@@ -6,13 +6,15 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-
+import {router} from "../../router";
 import { DEFAULT_GROUP_NAME } from "../../utils/constants";
 import toast from "react-hot-toast";
 
 export const logInWithEmailAndPassword = async (email, password) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
+    router.invalidate();
+    router.navigate("/");
   } catch (err) {
     console.error(err);
     toast.error(err.message);

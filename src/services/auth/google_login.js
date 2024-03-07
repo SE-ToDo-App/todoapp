@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 
 import { DEFAULT_GROUP_NAME } from "../../utils/constants";
 import toast from "react-hot-toast";
-
+import {router} from "../../router";
 const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = async () => {
   try {
@@ -21,6 +21,9 @@ export const signInWithGoogle = async () => {
         groups: { [DEFAULT_GROUP_NAME]: true },
       });
     }
+    router.navigate({to: "/"});
+    router.invalidate();
+
   } catch (err) {
     console.error(err);
     toast.error(err.message);

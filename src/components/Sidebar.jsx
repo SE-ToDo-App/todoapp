@@ -8,8 +8,8 @@ import {
   ListItemDecorator,
   useColorScheme,
 } from "@mui/joy";
-import { Outlet, useLoaderData, useNavigate } from "@tanstack/react-router";
-
+import { Outlet, useLoaderData, useNavigate, useSearch, Await, useMatch, Link, useRouterState } from "@tanstack/react-router";
+import { Suspense } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -29,6 +29,7 @@ import Sheet from "@mui/joy/Sheet";
 import SmsIcon from "@mui/icons-material/Sms";
 import Typography from "@mui/joy/Typography";
 import { useAuth } from "../services/firebase.config";
+import { DEFAULT_GROUP_NAME } from "../utils/constants";
 
 const containerStyle = {
   display: "flex",
@@ -37,7 +38,15 @@ const containerStyle = {
 };
 export default function Sidebar() {
   const { mode, setMode } = useColorScheme();
-  const { groups } = useLoaderData({ strict: false });
+  const { groups, count } = useLoaderData({ strict: false });
+  console.log("groups", groups);
+  const {list} = useSearch({strict: false});
+  const pathName = useRouterState({select: (state) => state.location.pathname})
+
+  const handleSelect = (_, newValue) => {
+    const adjustedValue = newValue || DEFAULT_GROUP_NAME;
+    navigate({search: (prev) => ({ ...prev, list: adjustedValue })}); 
+  };
   const [user] = useAuth();
   const navigate = useNavigate();
   return (
@@ -60,7 +69,7 @@ export default function Sidebar() {
           },
         })}>
         <Badge badgeContent="7" size="sm">
-          <IconButton onClick={() => navigate("/login")}>
+          <IconButton onClick={() => navigate({to: "/login"})}>
             <Avatar src={user?.photoURL} alt={user?.displayName} />
           </IconButton>
         </Badge>
@@ -80,8 +89,9 @@ export default function Sidebar() {
         }}>
         <Select
           variant="outlined"
-          defaultValue="1"
           size="sm"
+          value = {list}
+          onChange={handleSelect}
           startDecorator={
             <Sheet
               variant="solid"
@@ -95,9 +105,9 @@ export default function Sidebar() {
             </Sheet>
           }
           sx={{ py: 1 }}>
-          {groups?.map((group, index) => (
-            <Option value={String(index + 1)} key={group}>
-              {group}
+          {groups?.map(([id, group]) => (
+            <Option value={id} key={id}>
+              {group.name}
             </Option>
           ))}
         </Select>
@@ -109,9 +119,11 @@ export default function Sidebar() {
             minWidth: 200,
           }}>
           <ListItemButton
-            selected
-            variant="soft"
-            onClick={() => navigate("/")}>
+            selected={pathName === "/"}
+            component={Link}
+            to="/"
+            search={(prev) => ({ list: prev.list })}
+            >
             <ListItemDecorator>
               <SmsIcon />
             </ListItemDecorator>
@@ -122,10 +134,19 @@ export default function Sidebar() {
               color="neutral"
               variant="soft"
               sx={{ ml: "auto" }}>
-              5
+              <Suspense>
+                <Await promise={count}>
+                  {(data) => data}
+                  </Await>
+              </Suspense>
             </Chip>
           </ListItemButton>
-          <ListItemButton>
+          <ListItemButton
+            selected={pathName === "/tags"}
+            component={Link}
+            to="/tags"
+            search={(prev) => ({ list: prev.list })}
+            >
             <ListItemDecorator>
               <PersonIcon />
             </ListItemDecorator>

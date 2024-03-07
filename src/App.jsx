@@ -1,20 +1,12 @@
-import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { app, auth } from "./services/firebase.config";
+import { CssVarsProvider } from "@mui/joy/styles";
+import { RouterProvider } from "@tanstack/react-router";
 
-import { Box } from "@mui/joy";
-import ScopedCssBaseline from "@mui/joy/ScopedCssBaseline";
+import { Box, CssBaseline } from "@mui/joy";
 import { Toaster } from "react-hot-toast";
-import { getAuth } from "firebase/auth";
-import { routeTree } from "./routeTree.gen";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { router } from "./router";
+import { useAuth } from "./services/firebase.config";
 
-const router = createRouter({
-  routeTree,
-  context: {
-    user: undefined,
-  },
-});
 
 // const router = createBrowserRouter([
 //   {
@@ -45,18 +37,23 @@ const router = createRouter({
 // ],
 
 const App = () => {
-  const [root, setRoot] = useState(null);
+  const [user] = useAuth();
+  useEffect(() => {
+    if (user || user === null) {
+      router.invalidate();
+    }
+  }, [user]);
   return (
     <CssVarsProvider
-      colorSchemeNode={root}
       defaultMode="system"
-      modeStorageKey="awesome-todoapp">
-      <ScopedCssBaseline ref={(element) => setRoot(element)}>
+      modeStorageKey="awesome-todoapp"
+      disableNestedContext
+      >
+        <CssBaseline />
         <Box width="100vw" height="100vh">
           <RouterProvider router={router} />
           <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
         </Box>
-      </ScopedCssBaseline>
     </CssVarsProvider>
   );
 };

@@ -1,10 +1,9 @@
 import Sidebar from "../components/Sidebar.jsx";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { app } from "../services/firebase.config";
-import { createRootRoute } from "@tanstack/react-router";
-import { getAuth } from "firebase/auth";
-import { groupLoader } from "../services/todo/addTodo.js";
-
+import { TanStackRouterDevtools, } from "@tanstack/router-devtools";
+import { createRootRoute, defer} from "@tanstack/react-router";
+import { groupLoader, todoCountLoader } from "../services/api.js";
+import { DEFAULT_GROUP_NAME } from "../utils/constants.js";
+import { auth } from "../services/firebase.config.js";
 export const Route = createRootRoute({
   component: () => (
     <>
@@ -12,16 +11,17 @@ export const Route = createRootRoute({
       <TanStackRouterDevtools position="bottom-right" />
     </>
   ),
-  beforeLoad: () => {
-    const user = getAuth(app);
-
-    return { user: user.currentUser };
+  validateSearch: (search) => ({list : search.list || DEFAULT_GROUP_NAME}),
+  loaderDeps: ({search: {list}}) => ({list}),
+  beforeLoad: ({context}) => {
+    const user = auth.currentUser || context.user;
+    return { user };
   },
-  loader: async ({ context }) => {
-    console.log("context", context);
-    const groups = await groupLoader(context.user);
-    console.log("groups", groups);
-    return groups;
+
+  loader: async ({ context, deps }) => {
+    const data = await groupLoader(context.user);
+    const count = todoCountLoader(context.user, deps.list);
+    return { groups: data, count: defer(count) };
   },
   staleTime: 100_000,
 });
