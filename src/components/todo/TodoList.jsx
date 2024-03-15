@@ -65,7 +65,6 @@ export function TodoList() {
   return (
     <Box sx={containerStyle}>
       <Typography variant="h1" sx={titleStyle}>
-        {" "}
         TODO List App
       </Typography>
       <form>
@@ -90,11 +89,8 @@ export function TodoList() {
         </Box>
       </form>
       <List sx={{ p: 0 }}>
-        {todos?.map((todo, index) => (
-          <React.Fragment key={index}>
-            <ToDoItem todo={todo} />
-            {index < todos.length - 1 && <Divider light />}
-          </React.Fragment>
+        {todos?.map((todo) => (
+            <ToDoItem todo={todo} key={todo.createdAt} />
         ))}
       </List>
     </Box>

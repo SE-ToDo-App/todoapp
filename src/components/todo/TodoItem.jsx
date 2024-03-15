@@ -7,8 +7,7 @@ import {
   SwipeableListItem,
   TrailingActions,
 } from "react-swipeable-list";
-
-import ListItemText from "@mui/material/ListItemText";
+import { Checkbox, ListItem, Sheet } from "@mui/joy";
 
 const leadingActions = () => (
   <LeadingActions>
@@ -34,7 +33,9 @@ export function ToDoItem({ todo }) {
       <SwipeableListItem
         leadingActions={leadingActions()}
         trailingActions={trailingActions()}>
-        <ListItemText primary={todo.todo} />
+          <Sheet>
+          <Checkbox  label={todo.todo} checked={todo.isCompleted}/>
+          </Sheet>
       </SwipeableListItem>
     </SwipeableList>
   );
