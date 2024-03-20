@@ -4,8 +4,10 @@ import { RouterProvider } from "@tanstack/react-router";
 import { Box, CssBaseline } from "@mui/joy";
 import { Toaster } from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { router } from "./router";
+import { router, queryClient } from "./router";
 import { useAuth } from "./services/firebase.config";
+import { Query } from "react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 
 // const router = createBrowserRouter([
@@ -37,12 +39,6 @@ import { useAuth } from "./services/firebase.config";
 // ],
 
 const App = () => {
-  const [user] = useAuth();
-  useEffect(() => {
-    if (user || user === null) {
-      router.invalidate();
-    }
-  }, [user]);
   return (
     <CssVarsProvider
       defaultMode="system"
@@ -51,7 +47,9 @@ const App = () => {
       >
         <CssBaseline />
         <Box width="100vw" height="100vh">
+          <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
+          </QueryClientProvider>
           <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
         </Box>
     </CssVarsProvider>

@@ -40,6 +40,19 @@ export const addTodo = async ({ todo, group, user }) => {
   }
 };
 
+export const editTodo = async ({ id, user, ...props }) => {
+  if (!user?.uid) throw new Error("User not found");
+  try {
+    const todoRef = doc(db, "todos", id);
+    await updateDoc(todoRef, { ...props});
+    router.invalidate()
+  } catch (err) {
+    console.error(err);
+    toast.error(err.message);
+  }
+};
+
+
 export const useTodos = (user, group="") => {
   const q = user?.uid
     ? query(
@@ -183,5 +196,5 @@ export const todoLoader = async (user, group) => {
     where("group", "==", group)
   );
   const data = await getDocs(q);
-  return data.docs.map((doc) => doc.data());
+  return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 }
