@@ -1,14 +1,11 @@
 import { TodoList } from "../components/todo";
 import { createFileRoute } from "@tanstack/react-router";
-import { todoLoader } from "../services/api";
+import { todoOptions } from "../services/todoApi";
+
 export const Route = createFileRoute("/")({
-  loaderDeps: ({search: {list}}) => ({list}),
-  loader: async ({context, deps}) => {
-    console.log(context.user, deps.list, "what")
-    const data = await todoLoader(context.user, deps.list);
-    console.log(data, "data")
-    return data;
+  loaderDeps: ({ search: { list } }) => ({ list }),
+  loader: async ({ context: { queryClient }, deps }) => {
+    queryClient.ensureQueryData(todoOptions(deps.list));
   },
   component: TodoList,
-  staleTime: 10_000,
 });

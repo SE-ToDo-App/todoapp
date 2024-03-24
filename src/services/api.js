@@ -1,59 +1,30 @@
+import { HexColorPicker, RgbaColorPicker } from "react-colorful";
 import {
   addDoc,
   collection,
+  deleteField,
   doc,
   getCountFromServer,
   getDoc,
+  getDocs,
   query,
   setDoc,
   updateDoc,
   where,
-  deleteField,
-  getDocs
 } from "firebase/firestore";
 import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-import { HexColorPicker, RgbaColorPicker } from "react-colorful";
-import tinycolor from 'tinycolor2'
-import { db } from "./firebase.config";
-import toast from "react-hot-toast";
-import {router } from "../router";
-import { generateTimestampKey } from "../utils/helper";
+
 import { DEFAULT_GROUP_NAME } from "../utils/constants";
+import { db } from "./firebase.config";
+import { generateTimestampKey } from "../utils/helper";
+import { router } from "../router";
+import tinycolor from "tinycolor2";
+import toast from "react-hot-toast";
 
-export const addTodo = async ({ todo, group, user }) => {
-  if (!user?.uid) throw new Error("User not found");
-  const current = new Date();
-  try {
-    await addDoc(collection(db, "todos"), {
-      todo,
-      group,
-      isCompleted: false,
-      createdAt: current.toISOString(),
-      createdBy: user.uid,
-    });
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message);
-  }
-};
-
-export const editTodo = async ({ id, user, ...props }) => {
-  if (!user?.uid) throw new Error("User not found");
-  try {
-    const todoRef = doc(db, "todos", id);
-    await updateDoc(todoRef, { ...props});
-    router.invalidate()
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message);
-  }
-};
-
-
-export const useTodos = (user, group="") => {
+export const useTodos = (user, group = "") => {
   const q = user?.uid
     ? query(
         collection(db, "todos"),
@@ -72,11 +43,10 @@ const groupConverter = {
   toFirestore: (groups) => {
     return {
       groups: groups.reduce((acc, group) => {
-        const id = generateTimestampKey("group")
+        const id = generateTimestampKey("group");
         acc[id] = { name: group };
         return acc;
-      }
-      , {})
+      }, {}),
     };
   },
 };
@@ -85,14 +55,14 @@ const tagConverter = {
     const data = snapshot.data(options);
     return data.tags ? Object.entries(data.tags).sort() : [];
   },
-  toFirestore: ({name, color}) => {
+  toFirestore: ({ name, color }) => {
     if (!tinycolor(color).isValid()) {
-      color = "#000000"
+      color = "#000000";
     }
-    const id = generateTimestampKey("tag")
-    console.log("id", id)
+    const id = generateTimestampKey("tag");
+    console.log("id", id);
     return {
-      tags: { [id]:  {name, color} }
+      tags: { [id]: { name, color } },
     };
   },
 };
@@ -129,31 +99,6 @@ export const useTags = (user) => {
   });
 };
 
-export const addTag = async ({ name, color, user }) => {
-  try {
-    if (!user?.uid) throw new Error("User not found");
-    console.log("name", name, "color", color)
-    const userDocRef = doc(db, "users", user.uid).withConverter(tagConverter);
-    const data = await setDoc(userDocRef, {name, color}, { merge: true });
-    router.invalidate()
-    return data;
-  } catch (err) {
-    console.error(err);
-    toast.error(err.message);
-  }
-}
-export const deleteTag = async ({ id, user }) => {
-    if (!user?.uid) throw new Error("User not found");
-    const userDocRef = doc(db, "users", user.uid)
-    const update = updateDoc(userDocRef, {[`tags.${id}`]: deleteField()})
-    toast.promise(update, {
-      loading: "Deleting Tag",
-      success: "Tag Deleted",
-      error: "Failed to Delete Tag"
-    })
-    await update
-    router.invalidate()
-};
 export const tagLoader = async (user) => {
   if (!user?.uid) return { tags: [] };
   const userDocRef = doc(db, "users", user.uid).withConverter(tagConverter);
@@ -164,10 +109,8 @@ export const tagLoader = async (user) => {
   return docSnap.data();
 };
 
-
-
 export const groupLoader = async (user) => {
-  const DEFAULT = [DEFAULT_GROUP_NAME, { name: DEFAULT_GROUP_NAME }]
+  const DEFAULT = [DEFAULT_GROUP_NAME, { name: DEFAULT_GROUP_NAME }];
   if (!user?.uid) return [DEFAULT];
   const userDocRef = doc(db, "users", user.uid).withConverter(groupConverter);
   const docSnap = await getDoc(userDocRef);
@@ -197,4 +140,4 @@ export const todoLoader = async (user, group) => {
   );
   const data = await getDocs(q);
   return data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-}
+};

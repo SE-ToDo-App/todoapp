@@ -1,12 +1,13 @@
 // Import the functions you need from the SDKs you need
 
-import { getAuth, signOut,  } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
+import { router } from "../router";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {router} from "../router";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -29,12 +30,15 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 export const useAuth = () => useAuthState(auth);
-export const user = await new Promise((resolve, reject) => {
-  const unsubscribe = auth.onAuthStateChanged((user) => {
-    unsubscribe();
-    resolve(user);
-  }, reject);
-})
+export const getUser = () =>
+  new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    }, reject);
+  });
+
+export const UserError = new Error("User not found");
 
 export const logout = async () => {
   await signOut(auth);

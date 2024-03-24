@@ -1,17 +1,13 @@
 import { Box, Button, Input, Typography } from "@mui/joy";
-import React, { useState } from "react";
-import {
-  addTodo as addTodoFirebase,
-  useTodos,
-  todoCountLoader,
-} from "../../services/api";
-import { useAuth } from "../../services/firebase.config";
+import { addTodo, todoOptions } from "../../services/todoApi";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useRouteContext, useSearch } from "@tanstack/react-router";
 
 import AddIcon from "@mui/icons-material/Add";
-import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
+import ToDoDatePicker from "./ToDoDatePicker";
 import { ToDoItem } from "./TodoItem";
-import { useLoaderData, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 
 const containerStyle = {
   maxWidth: "350px",
@@ -37,24 +33,32 @@ const titleStyle = {
 };
 
 export function TodoList() {
-  const [user] = useAuth();
   const [input, setInput] = useState("");
+  const [expanded, setExpanded] = useState("");
+  const { list } = useSearch({ strict: false });
 
-  const todos = useLoaderData({strict: false});
-  console.log(todos, "todos")
+  const { data: todos } = useSuspenseQuery(todoOptions(list));
+  const { queryClient } = useRouteContext({ strict: false });
 
-  const addTodo = async () => {
-    if (input) {
+  const { mutateAsync } = useMutation({
+    mutationFn: ({ todo, group }) => addTodo({ todo, group }),
+    onSettled: () => {
       setInput("");
-      if (!user) return;
-      await addTodoFirebase({ todo: input, group: "groupplaceholder", user });
-    }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(todoOptions(list).queryKey);
+    },
+  });
+
+  const handleAddTodo = async () => {
+    if (!input) return;
+    await mutateAsync({ todo: input, group: list });
   };
 
   const handleEnter = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      addTodo();
+      handleAddTodo();
     }
   };
 
@@ -81,7 +85,7 @@ export function TodoList() {
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Button
             startDecorator={<AddIcon />}
-            onClick={addTodo}
+            onClick={handleAddTodo}
             style={buttonStyle}
             variant="soft">
             Add Todo
@@ -90,9 +94,12 @@ export function TodoList() {
       </form>
       <List sx={{ p: 0 }}>
         {todos?.map((todo) => (
-            <ToDoItem todo={todo} key={todo.createdAt} />
+          <div key={todo.id} onClick={() => setExpanded(todo.createdAt)}>
+            <ToDoItem todo={todo} expanded={expanded === todo.createdAt} />
+          </div>
         ))}
       </List>
+      <ToDoDatePicker />
     </Box>
   );
 }

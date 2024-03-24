@@ -1,3 +1,11 @@
+import {
+  Await,
+  Link,
+  Outlet,
+  useNavigate,
+  useRouterState,
+  useSearch,
+} from "@tanstack/react-router";
 import Badge, { badgeClasses } from "@mui/joy/Badge";
 import {
   Button,
@@ -8,8 +16,8 @@ import {
   ListItemDecorator,
   useColorScheme,
 } from "@mui/joy";
-import { Outlet, useLoaderData, useNavigate, useSearch, Await, useMatch, Link, useRouterState } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
+
 import AddIcon from "@mui/icons-material/Add";
 import Avatar from "@mui/joy/Avatar";
 import Box from "@mui/joy/Box";
@@ -20,16 +28,17 @@ import Chip from "@mui/joy/Chip";
 import CircularProgress from "@mui/joy/CircularProgress";
 import ColorLensRoundedIcon from "@mui/icons-material/ColorLensRounded";
 import CreateTodo from "./todo/CreateTodoList";
+import { DEFAULT_GROUP_NAME } from "../utils/constants";
 import ListSubheader from "@mui/joy/ListSubheader";
 import Option from "@mui/joy/Option";
 import PersonIcon from "@mui/icons-material/Person";
-import PieChart from "@mui/icons-material/PieChart";
 import Select from "@mui/joy/Select";
 import Sheet from "@mui/joy/Sheet";
 import SmsIcon from "@mui/icons-material/Sms";
 import Typography from "@mui/joy/Typography";
+import { groupQueryOptions } from "../services/groupApi";
+import { todoCountOptions } from "../services/todoApi";
 import { useAuth } from "../services/firebase.config";
-import { DEFAULT_GROUP_NAME } from "../utils/constants";
 
 const containerStyle = {
   display: "flex",
@@ -38,14 +47,15 @@ const containerStyle = {
 };
 export default function Sidebar() {
   const { mode, setMode } = useColorScheme();
-  const { groups, count } = useLoaderData({ strict: false });
-  console.log("groups", groups);
-  const {list} = useSearch({strict: false});
-  const pathName = useRouterState({select: (state) => state.location.pathname})
-
+  const { list } = useSearch({ strict: false });
+  const pathName = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const { data: groups } = useSuspenseQuery(groupQueryOptions());
+  const { data: count } = useSuspenseQuery(todoCountOptions(list));
   const handleSelect = (_, newValue) => {
     const adjustedValue = newValue || DEFAULT_GROUP_NAME;
-    navigate({search: (prev) => ({ ...prev, list: adjustedValue })}); 
+    navigate({ search: (prev) => ({ ...prev, list: adjustedValue }) });
   };
   const [user] = useAuth();
   const navigate = useNavigate();
@@ -69,7 +79,7 @@ export default function Sidebar() {
           },
         })}>
         <Badge badgeContent="7" size="sm">
-          <IconButton onClick={() => navigate({to: "/login"})}>
+          <IconButton onClick={() => navigate({ to: "/login" })}>
             <Avatar src={user?.photoURL} alt={user?.displayName} />
           </IconButton>
         </Badge>
@@ -90,7 +100,7 @@ export default function Sidebar() {
         <Select
           variant="outlined"
           size="sm"
-          value = {list}
+          value={list}
           onChange={handleSelect}
           startDecorator={
             <Sheet
@@ -122,8 +132,7 @@ export default function Sidebar() {
             selected={pathName === "/"}
             component={Link}
             to="/"
-            search={(prev) => ({ list: prev.list })}
-            >
+            search={(prev) => ({ list: prev.list })}>
             <ListItemDecorator>
               <SmsIcon />
             </ListItemDecorator>
@@ -134,19 +143,14 @@ export default function Sidebar() {
               color="neutral"
               variant="soft"
               sx={{ ml: "auto" }}>
-              <Suspense>
-                <Await promise={count}>
-                  {(data) => data}
-                  </Await>
-              </Suspense>
+              {count}
             </Chip>
           </ListItemButton>
           <ListItemButton
             selected={pathName === "/tags"}
             component={Link}
             to="/tags"
-            search={(prev) => ({ list: prev.list })}
-            >
+            search={(prev) => ({ list: prev.list })}>
             <ListItemDecorator>
               <PersonIcon />
             </ListItemDecorator>
